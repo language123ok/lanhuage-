@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Talent Quiz</title>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            text-align: center;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .instructions {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .swiper-container {
+            width: 100%;
+            height: 400px; /* Adjust height to ensure content is centered */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .swiper-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        .swiper-slide {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            width: 100%;
+            height: 100%;
+        }
+        .swiper-slide-hidden {
+            opacity: 0;
+        }
+        .options {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            text-align: left; /* Align options to the left */
+        }
+        .options li {
+            margin-bottom: 10px;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            text-align: center;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Language Talent Quiz</h1>
+        <div class="instructions">
+            <p>Read and try to understand the text in each question. Swipe to navigate through the questions. After finishing, click the submit button to see your results.</p>
+        </div>
+        <div class="swiper-container">
+            <div class="swiper-wrapper" id="quiz"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+        <button class="button" id="submit" style="display: none;">Submit Answers</button>
+        <div class="result" id="result">
+            <h2>Your Language Talent</h2>
+            <p id="result-text"></p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        const quizData = [
+            {
+                question: "El gato está sobre la mesa.",
+                options: [
+                    "A cat is on the table.",
+                    "A dog is in the house.",
+                    "The bird is flying.",
+                    "The book is open."
+                ],
+                correct: 0,
+                family: "Romance"
+            },
+            {
+                question: "彼は新しい車を買いました。",
+                options: [
+                    "He bought a new car.",
+                    "She went to the market.",
+                    "They are watching a movie.",
+                    "We are having dinner."
+                ],
+                correct: 0,
+                family: "Japonic"
+            },
+            {
+                question: "Моя мама готовит ужин.",
+                options: [
+                    "My mom is cooking dinner.",
+                    "My dad is fixing the car.",
+                    "My sister is playing soccer.",
+                    "My brother is reading a book."
+                ],
+                correct: 0,
+                family: "Slavic"
+            },
+            {
+                question: "Jo brolis yra dailininkas.",
+                options: [
+                    "His brother is an artist.",
+                    "Her sister is a teacher.",
+                    "Their father is a doctor.",
+                    "Our mother is a chef."
+                ],
+                correct: 0,
+                family: "Baltic"
+            },
+            {
+                question: "Hän menee kouluun.",
+                options: [
+                    "He/she is going to school.",
+                    "They are playing outside.",
+                    "We are eating lunch.",
+                    "You are reading a book."
+                ],
+                correct: 0,
+                family: "Uralic"
+            },
+            {
+                question: "她每天早上跑步。",
+                options: [
+                    "She runs every morning.",
+                    "He studies every night.",
+                    "They play soccer in the evening.",
+                    "We cook dinner every day."
+                ],
+                correct: 0,
+                family: "Sino-Tibetan"
+            },
+            {
+                question: "Loro hanno visitato il museo ieri.",
+                options: [
+                    "They visited the museum yesterday.",
+                    "He bought a new car last week.",
+                    "She cooked a meal last night.",
+                    "We went to the park this morning."
+                ],
+                correct: 0,
+                family: "Romance"
+            },
+            {
+                question: "오늘 날씨가 좋아요.",
+                options: [
+                    "The weather is good today.",
+                    "He is going to work.",
+                    "They are watching TV.",
+                    "She is reading a book."
+                ],
+                correct: 0,
+                family: "Japonic"
+            },
+            {
+                question: "Czytałem ciekawą książkę wczoraj.",
+                options: [
+                    "I read an interesting book yesterday.",
+                    "We went to the cinema last week.",
+                    "She is writing a letter now.",
+                    "He is cooking dinner tonight."
+                ],
+                correct: 0,
+                family: "Slavic"
+            },
+            {
+                question: "Es eju uz darbu.",
+                options: [
+                    "I am going to work.",
+                    "He is playing soccer.",
+                    "She is dancing.",
+                    "They are sleeping."
+                ],
+                correct: 0,
+                family: "Baltic"
+            },
+            {
+                question: "A barátom szereti a zenét.",
+                options: [
+                    "My friend likes music.",
+                    "She is learning to drive.",
+                    "He went to the market.",
+                    "They are playing chess."
+                ],
+                correct: 0,
+                family: "Uralic"
+            },
+            {
+                question: "佢哋喺圖書館睇書。",
+                options: [
+                    "They are reading books in the library.",
+                    "He is cooking in the kitchen.",
+                    "She is dancing in the room.",
+                    "We are playing in the park."
+                ],
+                correct: 0,
+                family: "Sino-Tibetan"
+            },
+            {
+                question: "Ela está lendo um livro.",
+                options: [
+                    "She is reading a book.",
+                    "He is writing a letter.",
+                    "They are swimming in the pool.",
+                    "We are eating dinner."
+                ],
+                correct: 0,
+                family: "Romance"
+            },
+            {
+                question: "クヮーイーシ ユミャー サバイ.",
+                options: [
+                    "He is fixing the boat.",
+                    "She is watching a movie.",
+                    "They are playing soccer.",
+                    "We are going to the market."
+                ],
+                correct: 0,
+                family: "Japonic"
+            },
+            {
+                question: "On voli da igra fudbal.",
+                options: [
+                    "He likes to play football.",
+                    "She is cooking dinner.",
+                    "They are reading books.",
+                    "We are watching TV."
+                ],
+                correct: 0,
+                family: "Slavic"
+            },
+            {
+                question: "Ta läheb homme kooli.",
+                options: [
+                    "He/she is going to school tomorrow.",
+                    "They went to the park yesterday.",
+                    "We are having lunch now.",
+                    "You are reading a newspaper."
+                ],
+                correct: 0,
+                family: "Uralic"
+            },
+            {
+                question: "Ils ont visité le musée le week-end dernier.",
+                options: [
+                    "They visited the museum last weekend.",
+                    "He is painting the house.",
+                    "She is learning French.",
+                    "We are traveling to Paris."
+                ],
+                correct: 0,
+                family: "Romance"
+            },
+            {
+                question: "他每天晚上学习。",
+                options: [
+                    "He studies every night.",
+                    "She is cooking dinner.",
+                    "They are playing basketball.",
+                    "We are going shopping."
+                ],
+                correct: 0,
+                family: "Sino-Tibetan"
+            },
+            {
+                question: "Тя пише писмо до приятел.",
+                options: [
+                    "She is writing a letter to a friend.",
+                    "He is reading a book at home.",
+                    "They are watching a movie.",
+                    "We are going to the market."
+                ],
+                correct: 0,
+                family: "Slavic"
+            },
+            {
+                question: "Viņa klausās mūziku katru vakaru.",
+                options: [
+                    "She listens to music every evening.",
+                    "He is playing the piano.",
+                    "They are watching TV.",
+                    "We are eating dinner."
+                ],
+                correct: 0,
+                family: "Baltic"
+            },
+            {
+                question: "Hän rakastaa lukea kirjoja.",
+                options: [
+                    "He/she loves to read books.",
+                    "They are going to the cinema.",
+                    "We are playing basketball.",
+                    "You are cooking dinner."
+                ],
+                correct: 0,
+                family: "Uralic"
+            },
+            {
+                question: "佢鐘意畫畫。",
+                options: [
+                    "He/she likes to draw.",
+                    "They are singing a song.",
+                    "We are playing soccer.",
+                    "You are reading a newspaper."
+                ],
+                correct: 0,
+                family: "Sino-Tibetan"
+            },
+            {
+                question: "Ea merge la școală în fiecare zi.",
+                options: [
+                    "She goes to school every day.",
+                    "He is working in the office.",
+                    "They are cooking dinner.",
+                    "We are reading books."
+                ],
+                correct: 0,
+                family: "Romance"
+            },
+            {
+                question: "그는 매일 아침 운동해요.",
+                options: [
+                    "He exercises every morning.",
+                    "She is studying English.",
+                    "They are playing tennis.",
+                    "We are going to the beach."
+                ],
+                correct: 0,
+                family: "Japonic"
+            },
+            {
+                question: "Ona varí večeru.",
+                options: [
+                    "She is cooking dinner.",
+                    "He is reading a book.",
+                    "They are watching TV.",
+                    "We are playing soccer."
+                ],
+                correct: 0,
+                family: "Slavic"
+            },
+            {
+                question: "A macska alszik az ágyon.",
+                options: [
+                    "The cat is sleeping on the bed.",
+                    "The dog is running in the park.",
+                    "The bird is singing in the tree.",
+                    "The fish is swimming in the tank."
+                ],
+                correct: 0,
+                family: "Uralic"
+            },
+            {
+                question: "Eles estão assistindo a um filme agora.",
+                options: [
+                    "They are watching a movie now.",
+                    "He is cooking dinner.",
+                    "She is reading a book.",
+                    "We are playing a game."
+                ],
+                correct: 0,
+                family: "Romance"
+            },
+            {
+                question: "他正在写一封信。",
+                options: [
+                    "He is writing a letter.",
+                    "She is dancing in the room.",
+                    "They are eating dinner.",
+                    "We are going shopping."
+                ],
+                correct: 0,
+                family: "Sino-Tibetan"
+            },
+            {
+                question: "Она гуляет в парке каждый вечер.",
+                options: [
+                    "She walks in the park every evening.",
+                    "He is studying for the exam.",
+                    "They are having a meeting.",
+                    "We are cleaning the house."
+                ],
+                correct: 0,
+                family: "Slavic"
+            },
+            {
+                question: "Me sööme lõunat.",
+                options: [
+                    "We are eating lunch.",
+                    "He is reading a newspaper.",
+                    "She is playing the piano.",
+                    "They are going to the market."
+                ],
+                correct: 0,
+                family: "Uralic"
+            },
+            {
+                question: "Ellos están hablando por teléfono.",
+                options: [
+                    "They are talking on the phone.",
+                    "He is watching a movie.",
+                    "She is cooking dinner.",
+                    "We are playing a game."
+                ],
+                correct: 0,
+                family: "Romance"
+            },
+            {
+                question: "그녀는 학교에 있어요.",
+                options: [
+                    "She is at school.",
+                    "He is at work.",
+                    "They are at the park.",
+                    "We are at home."
+                ],
+                correct: 0,
+                family: "Japonic"
+            },
+            {
+                question: "On gra na pianinie.",
+                options: [
+                    "He is playing the piano.",
+                    "She is reading a book.",
+                    "They are watching TV.",
+                    "We are cooking dinner."
+                ],
+                correct: 0,
+                family: "Slavic"
+            },
+            {
+                question: "Ji skaito knygą.",
+                options: [
+                    "She is reading a book.",
+                    "He is writing a letter.",
+                    "They are playing soccer.",
+                    "We are eating lunch."
+                ],
+                correct: 0,
+                family: "Baltic"
+            },
+            {
+                question: "佢哋喺學校玩。",
+                options: [
+                    "They are playing at school.",
+                    "He is cooking dinner.",
+                    "She is reading a book.",
+                    "We are watching TV."
+                ],
+                correct: 0,
+                family: "Sino-Tibetan"
+            },
+            {
+                question: "Oni gledaju film u bioskopu.",
+                options: [
+                    "They are watching a movie in the cinema.",
+                    "He is studying in the library.",
+                    "She is dancing in the room.",
+                    "We are playing a game."
+                ],
+                correct: 0,
+                family: "Slavic"
+            }
+        ];
+
+        function loadQuiz() {
+            const quizContainer = document.getElementById('quiz');
+            quizContainer.innerHTML = '';
+            quizData.forEach((data, index) => {
+                const slide = document.createElement('div');
+                slide.classList.add('swiper-slide');
+
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `<p>${data.question}</p>`;
+
+                const optionsList = document.createElement('ul');
+                optionsList.classList.add('options');
+                data.options.forEach((option, i) => {
+                    const optionItem = document.createElement('li');
+                    optionItem.innerHTML = `<input type="radio" name="question${index}" value="${i}"> ${option}`;
+                    optionsList.appendChild(optionItem);
+                });
+
+                questionDiv.appendChild(optionsList);
+                slide.appendChild(questionDiv);
+                quizContainer.appendChild(slide);
+            });
+
+            const swiper = new Swiper('.swiper-container', {
+                direction: 'horizontal',
+                loop: false,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                centeredSlides: true,
+                on: {
+                    slideChangeTransitionStart: function () {
+                        const activeSlide = document.querySelector('.swiper-slide-active');
+                        const prevSlide = document.querySelector('.swiper-slide-prev');
+                        const nextSlide = document.querySelector('.swiper-slide-next');
+
+                        if (prevSlide) {
+                            prevSlide.classList.add('swiper-slide-hidden');
+                        }
+                        if (nextSlide) {
+                            nextSlide.classList.add('swiper-slide-hidden');
+                        }
+                        activeSlide.classList.remove('swiper-slide-hidden');
+
+                        if (swiper.isEnd) {
+                            document.getElementById('submit').style.display = 'block';
+                        } else {
+                            document.getElementById('submit').style.display = 'none';
+                        }
+                    }
+                }
+            });
+        }
+
+        function getResults() {
+            const selectedOptions = document.querySelectorAll('input[type="radio"]:checked');
+            let familyCounts = {
+                "Romance": 0,
+                "Japonic": 0,
+                "Slavic": 0,
+                "Baltic": 0,
+                "Uralic": 0,
+                "Sino-Tibetan": 0
+            };
+            selectedOptions.forEach((option, index) => {
+                if (parseInt(option.value) === quizData[index].correct) {
+                    familyCounts[quizData[index].family]++;
+                }
+            });
+            return familyCounts;
+        }
+
+        function showResults() {
+            const results = getResults();
+            const resultText = document.getElementById('result-text');
+            let maxCount = 0;
+            let bestFamily = "";
+            for (let family in results) {
+                if (results[family] > maxCount) {
+                    maxCount = results[family];
+                    bestFamily = family;
+                }
+            }
+            resultText.innerHTML = `You have a higher probability of having talent in ${bestFamily} languages.`;
+            document.getElementById('result').style.display = 'block';
+        }
+
+        document.getElementById('submit').addEventListener('click', showResults);
+
+        loadQuiz();
+    </script>
+</body>
+</html>
